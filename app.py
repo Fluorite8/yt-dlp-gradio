@@ -6,19 +6,6 @@ import json
 from functools import partial
 from utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS
 
-my_js = """
-                <script>
-                function periodicUpdate() {
-                    let countdown = 10;
-                    const button = document.querySelector('#refresh-btn');
-                    button.innerText = 'hahaha';
-   
-                }
-                periodicUpdate();
-                </script>
-            """
-
-
 # Create the config and job list if it doesn't exist
 with FileLock(FILE_LOCK, timeout=5):
     if not os.path.exists(CONFIG_FILE):
