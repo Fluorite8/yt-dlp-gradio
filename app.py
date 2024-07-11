@@ -126,7 +126,7 @@ def resume_job(id):
     with FileLock(FILE_LOCK, timeout=5):
         with open(JOB_LIST_FILE, "r") as f:
             job_list = json.load(f)
-        if job_list[id]["status"] == "paused":
+        if job_list[id]["status"] == "paused" or job_list[id]["status"] == "error":
             job_list[id]["status"] = "pending"
         with open(JOB_LIST_FILE, "w") as f:
             json.dump(job_list, f)
