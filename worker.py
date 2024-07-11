@@ -64,12 +64,12 @@ while True:
             config = json.load(f)
     if args.worker_id >= config["threads"]:
         # I'm a inactive worker, sleep for a while and try again
-        print(f"Worker {args.worker_id} is inactive")
+        # print(f"Worker {args.worker_id} is inactive")
         continue
     
     # Check if I'm an idle worker
     if my_status == "idle":
-        print(f"Worker {args.worker_id} is in idle")
+        # print(f"Worker {args.worker_id} is in idle")
         # Try to bind to a job with status pending
         with FileLock(FILE_LOCK, timeout=5):
             with open(JOB_LIST_FILE, 'r') as f:
@@ -87,7 +87,7 @@ while True:
     
     # Check if I'm a running worker
     if my_status == "running":
-        print(f"Worker {args.worker_id} is running")
+        # print(f"Worker {args.worker_id} is running")
         # Check if my job is paused or removed
         with FileLock(FILE_LOCK, timeout=5):
             with open(JOB_LIST_FILE, 'r') as f:

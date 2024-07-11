@@ -6,6 +6,18 @@ import json
 from functools import partial
 from utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS
 
+my_js = """
+                <script>
+                function periodicUpdate() {
+                    let countdown = 10;
+                    const button = document.querySelector('#refresh-btn');
+                    button.innerText = 'hahaha';
+   
+                }
+                periodicUpdate();
+                </script>
+            """
+
 
 # Create the config and job list if it doesn't exist
 with FileLock(FILE_LOCK, timeout=5):
@@ -144,7 +156,7 @@ def remove_job(id):
     return job_list_update()
 
 
-with gr.Blocks() as demo:
+with gr.Blocks(js = my_js) as demo:
     
     txt = [None] * MAX_JOBS
     btn_pause = [None] * MAX_JOBS
@@ -162,6 +174,10 @@ with gr.Blocks() as demo:
         
 
     with gr.Tab("Job List") as tab_jl:
+        with gr.Row():
+            btn_refresh_jl = gr.Button("Refresh",elem_id="refresh_jl")
+        with gr.Row():
+            gr.Markdown("---")
         for i in range(MAX_JOBS):
             with gr.Row():
                 txt[i] = gr.Markdown("Textbox", label="Job", visible=False)
@@ -184,7 +200,10 @@ with gr.Blocks() as demo:
             btn_resume[i].click(fn=partial(resume_job,i), inputs=None,
                 outputs=txt+btn_pause+btn_remove+btn_resume+spl_line  
             )
-
+        btn_refresh_jl.click(
+            fn=job_list_update, inputs=None, 
+            outputs=txt+btn_pause+btn_remove+btn_resume+spl_line
+        )
     
     with gr.Tab("Settings") as tab_set:
         threads = gr.Slider(1, MAX_WORKERS, step=1, label="Threads", interactive=True)
