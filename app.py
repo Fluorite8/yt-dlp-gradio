@@ -143,7 +143,7 @@ def remove_job(id):
     return job_list_update()
 
 
-with gr.Blocks(js = my_js) as demo:
+with gr.Blocks() as demo:
     
     txt = [None] * MAX_JOBS
     btn_pause = [None] * MAX_JOBS

@@ -7,7 +7,7 @@ JOB_LIST_FILE = "job_list.json"
 FILE_LOCK = "file.lock"
 DFAULT_CONFIG = {
     "threads": 3,
-    "params": "-R 100"
+    "params": "-R 100 --no-playlist --retry-sleep linear=1:10:2 --abort-on-unavailable-fragments"
 }
 
 def job_tag(url:str, params:str):
