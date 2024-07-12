@@ -15,9 +15,11 @@ with FileLock(FILE_LOCK, timeout=5):
         with open(JOB_LIST_FILE, "w") as f:
             json.dump([], f)
 
-# Create tmp dir if it doesn't exist
-if not os.path.exists("tmp"):
-    os.mkdir("tmp")
+with FileLock(FILE_LOCK, timeout=5):
+    with open(CONFIG_FILE, "r") as f:
+        config = json.load(f)
+    if not os.path.exists(config["output_dir"]):
+        os.mkdir(config["output_dir"])
 
 # Job status: pending, running, paused, finished, error
 # On startup, all running jobs are reset to pending, since no worker is running at this moment.
@@ -98,13 +100,16 @@ def get_settings():
             config = json.load(f)
     return config
 
-def update_settings_fn(n_worker, default_param):
+def update_settings_fn(n_worker, default_param, output_dir):
     # Update config
     with FileLock(FILE_LOCK, timeout=5):
         with open(CONFIG_FILE, "r") as f:
             config = json.load(f)
         config["threads"] = n_worker
         config["params"] = default_param
+        config["output_dir"] = output_dir
+        if not os.path.exists(config["output_dir"]):
+            os.mkdir(config["output_dir"])
         with open(CONFIG_FILE, "w") as f:
             json.dump(config, f)
 
@@ -195,13 +200,14 @@ with gr.Blocks() as demo:
     with gr.Tab("Settings") as tab_set:
         threads = gr.Slider(1, MAX_WORKERS, step=1, label="Threads", interactive=True)
         default_param = gr.Textbox(label="Default Params", lines=5)
-        result = gr.Textbox(label="Result")
+        down_path = gr.Textbox(label="Download Path")
         update_settings = gr.Button("Update Settings")
+        result = gr.Textbox(label="Result")
 
 
         update_settings.click(
             fn = update_settings_fn,
-            inputs=[threads, default_param],
+            inputs=[threads, default_param, down_path],
             outputs=result
         )
 
@@ -218,9 +224,9 @@ with gr.Blocks() as demo:
     )
 
     tab_set.select(
-        fn=lambda: [get_settings()["params"], get_settings()["threads"]],
+        fn=lambda: [get_settings()["params"], get_settings()["threads"], get_settings()["output_dir"]],
         inputs=None,
-        outputs=[default_param, threads]
+        outputs=[default_param, threads, down_path]
     )
 
 demo.launch()

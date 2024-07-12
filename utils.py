@@ -1,4 +1,5 @@
 import hashlib
+import os
 
 MAX_JOBS = 15
 MAX_WORKERS = 5
@@ -7,8 +8,17 @@ JOB_LIST_FILE = "job_list.json"
 FILE_LOCK = "file.lock"
 DFAULT_CONFIG = {
     "threads": 3,
-    "params": "-R 100 --no-playlist --retry-sleep linear=1:10:2 --abort-on-unavailable-fragments"
+    "params": "-R 100 --no-playlist --retry-sleep linear=1:10:2 --abort-on-unavailable-fragments",
+    "output_dir": os.path.join(os.getcwd(), "YtDownloads/")
 }
+
+USER_CACHE = os.path.join(os.environ['HOME'], ".cache/")
+if not os.path.exists(USER_CACHE):
+    os.mkdir(USER_CACHE)
+
+CACHE_DIR = os.path.join(USER_CACHE, "yt-dlp-gradio/")
+if not os.path.exists(CACHE_DIR):
+    os.mkdir(CACHE_DIR)
 
 def job_tag(url:str, params:str):
     # Generate a unique tag for a job based on its URL and parameters
@@ -27,7 +37,7 @@ def gen_job_info(job):
     tag = job_tag(job["url"], job["params"])
     # Try to read last 3 lines of tmp/{tag}.log
     try:
-        with open(f"tmp/{tag}.log", "r") as f:
+        with open(os.path.join(CACHE_DIR, f"{tag}.log"), "r") as f:
             progress = f.readlines()[-3:]
     except:
         progress = ["No progress log found"]

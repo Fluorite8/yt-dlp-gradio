@@ -1,11 +1,12 @@
 import time
 import subprocess
 import os
+import shutil
 import json
 from filelock import FileLock
 import argparse
 
-from utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS
+from utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS, CACHE_DIR
 
 # Get my worker id from argparse, raise error if id is not in range
 parser = argparse.ArgumentParser()
@@ -36,11 +37,12 @@ def start_job(job):
     # Start downloading the job
     tag = job_tag(job["url"], job["params"])
     print(f"Worker {args.worker_id} is starting job {tag}")
-    sh_cmd = f"yt-dlp {job['url']} {job['params']} -o tmp/{tag}.mp4 > tmp/{tag}.log 2>&1"
+    sh_cmd = f"cd {CACHE_DIR} && yt-dlp {job['url']} {job['params']} -o {tag}.mp4 > {tag}.log 2>&1"
     print(sh_cmd)
-    my_proc = subprocess.Popen(sh_cmd, shell=True)
+    my_proc = subprocess.Popen(sh_cmd, shell=True, cwd=CACHE_DIR)
     # Set my status to running
     my_status = "running"
+
 
 def drop_job(job):
     global my_proc
@@ -52,9 +54,14 @@ def drop_job(job):
     # Set my status to idle
     my_status = "idle"
 
-def check_success(job):
+def check_success(job, output_dir):
     tag = job_tag(job["url"], job["params"])
-    return os.path.exists(f"tmp/{tag}.mp4")
+    tmp_path = os.path.join(CACHE_DIR, f"{tag}.mp4")
+    if os.path.exists(tmp_path):
+        shutil.move(tmp_path, os.path.join(output_dir,f"{tag}.mp4"))
+        return True
+    else:
+        return False
 
 while True:
     time.sleep(10)
@@ -112,9 +119,9 @@ while True:
                 # if my_proc exited, check if the job is successful
                 if my_proc.poll() is not None:
                     # Check if the job is successful
-                    if check_success(job_list[job_id]):
+                    if check_success(job_list[job_id], config["output_dir"]):
                         # Set the job status to success
-                        job_list[job_id]["status"] = "finished"
+                        job_list[job_id]["status"] = "finished"                        
                     else:
                         # Set the job status to failed
                         job_list[job_id]["status"] = "error"
