@@ -1,4 +1,6 @@
 __pycache__
 *.json
 *.lock
-tmp/
+YtDownloads/
+build/
+*.egg-info/

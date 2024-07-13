@@ -9,23 +9,19 @@ Supported platforms:
 
 ## Usage - Linux
 
-Clone this repo:
+Make sure you have python and git avaliable, then install this project:
 
 ```bash
-git clone https://github.com/Fluorite8/yt-dlp-gradio.git
-cd yt-dlp-gradio
+pip install git+https://github.com/Fluorite8/yt-dlp-gradio.git
 ```
-Install dependencies:
+
+Run server:
 
 ```bash
-pip install -r requirements.txt
+yt-dlp-gradio
 ```
 
-Start server:
-
-```bash
-python app.py
-```
+Now you can access the yt-dlp service by visiting http://127.0.0.1:7860.
 
 ## Usage - Android(termux)
 
@@ -43,7 +39,7 @@ curl -LO --compressed https://raw.githubusercontent.com/2moe/tmoe/2/2.awk; awk -
 curl -LO https://gitee.com/mo2/linux/raw/2/2.awk; awk -f 2.awk
 ```
 
-Install apt packages:
+Install dependencies:
 
 ```bash
 sudo apt install git ffmpeg python3-pip python-is-python3

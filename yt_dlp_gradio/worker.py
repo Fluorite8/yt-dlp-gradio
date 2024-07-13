@@ -6,7 +6,7 @@ import json
 from filelock import FileLock
 import argparse
 
-from utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS, CACHE_DIR
+from yt_dlp_gradio.utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS, CACHE_DIR
 
 # Get my worker id from argparse, raise error if id is not in range
 parser = argparse.ArgumentParser()

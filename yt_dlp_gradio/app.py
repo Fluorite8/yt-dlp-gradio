@@ -4,7 +4,8 @@ import gradio as gr
 from filelock import FileLock
 import json
 from functools import partial
-from utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS
+from yt_dlp_gradio.utils import gen_job_info, job_tag, MAX_JOBS, CONFIG_FILE, JOB_LIST_FILE, DFAULT_CONFIG, FILE_LOCK, MAX_WORKERS
+import sys
 
 # Create the config and job list if it doesn't exist
 with FileLock(FILE_LOCK, timeout=5):
@@ -39,7 +40,7 @@ with FileLock(FILE_LOCK, timeout=5):
 # Open MAX_WORKERS worker process with the same python interpreter
 # wrokers are assigned with --worker_id
 for i in range(MAX_WORKERS):
-    subprocess.Popen(["python", "worker.py", "--worker_id", str(i)])
+    subprocess.Popen([sys.executable, "-m", "yt_dlp_gradio.worker", "--worker_id", str(i)])
 
 def add_job(url, params):
     with FileLock(FILE_LOCK, timeout=5):
